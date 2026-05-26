@@ -1,18 +1,36 @@
 import sys
 import os
 import tkinter as tk
+from tkinter import PhotoImage
 import config as cfg
 from editor import CodeEditor
 from commands import CommandHandler
 
 class MainApp:
     def __init__(self):
-        self.root = tk.Tk()
+        self.root = tk.Tk() 
         self.root.title("MMT CodeEditor")
         self.root.geometry("800x600")
         
-        self.filename = "Новый файл"
+        if sys.platform == "win32":
+            import ctypes
+            myappid = "mmt.codeeditor.python.v1"
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+            
+            if os.path.exists("icon.ico"):
+                try:
+                    self.root.iconbitmap("icon.ico")
+                except Exception as e:
+                    print(f"Failed to load .ico icon: {e}")
+        else:
+            if os.path.exists("icon.png"):
+                try:
+                    self.icon_img = PhotoImage(file="icon.png")
+                    self.root.iconphoto(False, self.icon_img)
+                except Exception as e:
+                    print(f"Failed to load .png icon: {e}")
 
+        self.filename = "New File"
         self.editor = CodeEditor(self.root, app_callback=self)
 
         divider = tk.Frame(self.root, height=2, bg="#333333")
@@ -33,7 +51,6 @@ class MainApp:
                     self.editor.highlighter.highlight_all()
                 except Exception as e:
                     print(f"Error while reading the file: {e}")
-                    
             else:
                 self.root.title(f"MMT CodeEditor - {self.filename} (New file)")
            
@@ -84,8 +101,7 @@ class MainApp:
         try:
             cursor_pos = self.editor.text_area.index("insert")
             line, col = cursor_pos.split(".")
-            
-            self.status_bar.configure(text=f"Файл: {self.filename}  |  Ln {line}, Col {col}  |  UTF-8")
+            self.status_bar.configure(text=f"File: {self.filename}  |  Ln {line}, Col {col}  |  UTF-8")
         except Exception:
             pass
 
