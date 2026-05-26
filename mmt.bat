@@ -1,1 +1,2 @@
-@python "%~dp0main.py" %*
+@echo off
+pythonw "%~dp0main.pyw" %*
